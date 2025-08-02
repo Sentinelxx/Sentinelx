@@ -49,7 +49,7 @@ export function Navigation() {
             Upload Contract
           </Link>
           <Link href="/documentation" className="text-green-400 hover:text-green-300 transition-colors">
-            Documentation  
+            Documentations
           </Link>
           <Link href="/about" className="text-green-400 hover:text-green-300 transition-colors">
             About
