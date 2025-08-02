@@ -48,8 +48,8 @@ export function Navigation() {
           <Link href="/upload-contract" className="text-green-400 hover:text-green-300 transition-colors">
             Upload Contract
           </Link>
-          <Link href="/https://sentinel-whitepaper.vercel.app/" className="text-green-400 hover:text-green-300 transition-colors">
-            Documentation
+          <Link href="https://sentinel-whitepaper.vercel.app/" className="text-green-400 hover:text-green-300 transition-colors">
+            Whitepaper
           </Link>
           <Link href="/about" className="text-green-400 hover:text-green-300 transition-colors">
             About
