@@ -220,11 +220,10 @@ export default function AuditResults() {
                 <ArrowLeft className="h-4 w-4 mr-2" />
                 Back to Upload
               </Button>
-              
-              <div className="inline-flex items-center bg-green-950/50 px-4 py-2 rounded-full mb-4">
+              {/* <div className="inline-flex items-center bg-green-950/50 px-4 py-2 rounded-full mb-4">
                 <Shield className="h-4 w-4 mr-2" />
                 <span className="text-sm">AI Security Analysis Complete</span>
-              </div>
+              </div> */}
               
               <h1 className="text-3xl md:text-4xl font-bold">
                 <span className="text-green-400">{">"}</span> Audit Report

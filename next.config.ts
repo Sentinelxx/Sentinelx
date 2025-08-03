@@ -7,7 +7,7 @@ const cspHeader = `
   style-src 'self' 'unsafe-inline';
   img-src 'self' blob: data:;
   font-src 'self' https://fonts.gstatic.com;
-  connect-src 'self' https://sentinelx-backend.onrender.com;
+  connect-src 'self' https://sentinelx-backend.onrender.com https://mm-sdk-analytics.api.cx.metamask.io https://*.metamask.io;
   object-src 'none';
   base-uri 'self';
   form-action 'self';

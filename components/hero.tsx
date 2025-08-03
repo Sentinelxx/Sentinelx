@@ -3,11 +3,17 @@
 import { useState, useEffect } from "react"
 import { Shield, Lock, Zap } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { ConnectWallet } from "@/components/wallet/ConnectWallet"
+import { useSDK } from "@metamask/sdk-react"
 
 export function Hero() {
   const [titleText, setTitleText] = useState("")
   const [subtitleVisible, setSubtitleVisible] = useState(false)
   const [buttonsVisible, setButtonsVisible] = useState(false)
+  const { connected, chainId } = useSDK()
+  
+  // Check if wallet is properly connected to the right chain
+  const isWalletReady = connected && chainId === "0x20a55"
 
   const fullTitle = "Sentinel: The Ultimate Firewall for Smart Contracts"
 
@@ -58,12 +64,18 @@ export function Hero() {
         <div
           className={`flex flex-wrap justify-center gap-4 transition-opacity duration-1000 ${buttonsVisible ? "opacity-100" : "opacity-0"}`}
         >
-          <Button onClick={()=>window.location.href="/get-started"} className="bg-green-600 hover:bg-green-700 text-black font-bold px-6 py-3 rounded-md">
-            Get Started
-          </Button>
-          <Button onClick={()=> window.location.href="https://app.gitbook.com/o/UO3hYGggJBMeQGIczTah/s/pDNUEw0AjuWkqfI1z0U9/"} variant="outline" className="border-green-500 text-green-500 hover:bg-green-950 px-6 py-3 rounded-md">
-            View Documentation
-          </Button>
+          {!isWalletReady ? (
+            <ConnectWallet />
+          ) : (
+            <>
+              <Button onClick={()=>window.location.href="/upload-contract"} className="bg-green-600 hover:bg-green-700 text-black font-bold px-6 py-3 rounded-md">
+                Get Started
+              </Button>
+              <Button onClick={()=> window.location.href="https://app.gitbook.com/o/UO3hYGggJBMeQGIczTah/s/pDNUEw0AjuWkqfI1z0U9/"} variant="outline" className="border-green-500 text-green-500 hover:bg-green-950 px-6 py-3 rounded-md">
+                View Documentation
+              </Button>
+            </>
+          )}
         </div>
 
         {/* <div

@@ -6,6 +6,7 @@ import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import toast from "react-hot-toast";
 import {
   Upload,
   FileText,
@@ -31,7 +32,7 @@ export default function UploadContract() {
       };
       reader.readAsText(file);
     } else {
-      alert("Please upload a .sol file");
+      toast.error("Please upload a .sol file");
     }
   };
 
@@ -59,17 +60,18 @@ export default function UploadContract() {
       };
       reader.readAsText(files[0]);
     } else {
-      alert("Please upload a .sol file");
+      toast.error("Please upload a .sol file");
     }
   };
 
   const handleSubmit = async () => {
     if (!contractCode.trim()) {
-      alert("Please provide contract code to audit");
+      toast.error("Please provide contract code to audit");
       return;
     }
 
     setIsLoading(true);
+    toast.loading("Starting security audit...");
 
     try {
       const response = await fetch("https://sentinelx-backend.onrender.com/prompt", {
@@ -102,9 +104,13 @@ export default function UploadContract() {
       );
 
       // Navigate to the results page
+      toast.dismiss(); // Dismiss loading toast
+      toast.success("Audit completed successfully!");
       router.push(`/audit-results/${auditId}`);
     } catch (error) {
       console.error("Error:", error);
+      toast.dismiss(); // Dismiss loading toast
+      toast.error("Failed to complete audit. Please try again.");
     } finally {
       setIsLoading(false);
     }

@@ -17,7 +17,7 @@ import { ComplianceCarousel } from "@/components/compliance-carousel"
 
 export default function Home() {
   const [loaded, setLoaded] = useState(false)
-  const { authState, ocAuth } = useOCAuth();
+  // const { authState, ocAuth } = useOCAuth();
 
   useEffect(() => {
     // Force scroll to top immediately
@@ -61,21 +61,21 @@ export default function Home() {
   }, [])
   
   // Ensure authState exists before accessing properties
-   if (authState?.isLoading) {
-    return (
-      <div className="min-h-screen bg-black flex items-center justify-center">
-        <div className="text-green-500">Loading...</div>
-      </div>
-    );
-  }
+  //  if (authState?.isLoading) {
+  //   return (
+  //     <div className="min-h-screen bg-black flex items-center justify-center">
+  //       <div className="text-green-500">Loading...</div>
+  //     </div>
+  //   );
+  // }
 
-  if (authState?.error) {
-    return (
-      <div className="min-h-screen bg-black flex items-center justify-center">
-        <div className="text-red-400">Error: {authState.error.message}</div>
-      </div>
-    );
-  }
+  // if (authState?.error) {
+  //   return (
+  //     <div className="min-h-screen bg-black flex items-center justify-center">
+  //       <div className="text-red-400">Error: {authState.error.message}</div>
+  //     </div>
+  //   );
+  // }
 
   return (
     <main className="min-h-screen bg-black text-green-500 font-mono">
