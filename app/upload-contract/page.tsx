@@ -72,7 +72,7 @@ export default function UploadContract() {
     setIsLoading(true);
 
     try {
-      const response = await fetch("http://localhost:3000/prompt", {
+      const response = await fetch("https://sentinelx-backend.onrender.com", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -105,9 +105,6 @@ export default function UploadContract() {
       router.push(`/audit-results/${auditId}`);
     } catch (error) {
       console.error("Error:", error);
-      alert(
-        "Failed to connect to audit service. Please make sure the API is running on localhost:3000"
-      );
     } finally {
       setIsLoading(false);
     }
