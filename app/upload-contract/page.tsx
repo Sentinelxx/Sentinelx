@@ -72,7 +72,7 @@ export default function UploadContract() {
     setIsLoading(true);
 
     try {
-      const response = await fetch("https://sentinelx-backend.onrender.com", {
+      const response = await fetch("https://sentinelx-backend.onrender.com/prompt", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
