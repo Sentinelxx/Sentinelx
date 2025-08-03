@@ -4,10 +4,10 @@ import { useState, useEffect } from "react"
 import { Shield, Menu, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
-import { useOCAuth } from '@opencampus/ocid-connect-js';
+// import { useOCAuth } from '@opencampus/ocid-connect-js';
 
 export function Navigation() {
-  const { ocAuth } = useOCAuth();
+  // const { ocAuth } = useOCAuth();
   const [isScrolled, setIsScrolled] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
@@ -21,13 +21,13 @@ export function Navigation() {
   }, [])
 
  
-  const handleLogin = async () => {
-    try {
-      await ocAuth.signInWithRedirect({ state: 'opencampus' });
-    } catch (error) {
-      console.error('Login error:', error);
-    }
-  };
+  // const handleLogin = async () => {
+  //   try {
+  //     await ocAuth.signInWithRedirect({ state: 'opencampus' });
+  //   } catch (error) {
+  //     console.error('Login error:', error);
+  //   }
+  // };
 
   return (
     <header
@@ -63,7 +63,7 @@ export function Navigation() {
         </nav>
 
         <div className="hidden md:flex items-center space-x-4">
-          <Button onClick={handleLogin}  variant="outline" className="border-green-500 text-green-500 hover:bg-green-950">
+          <Button onClick={() => {console.log("OC-ID Login")}}  variant="outline" className="border-green-500 text-green-500 hover:bg-green-950">
             OC-ID Login
           </Button>
           <Button onClick={()=> {window.location.href="https://github.com/Aryanzutshi/Sentinel"}} className="bg-green-600 hover:bg-green-700 text-black">Github</Button>
@@ -107,7 +107,7 @@ export function Navigation() {
           </Link>
 
           <div className="pt-8 flex flex-col space-y-4">
-            <Button onClick={handleLogin} variant="outline" className="border-green-500 text-green-500 hover:bg-green-950">
+            <Button onClick={() => {console.log("OC-ID Login")}} variant="outline" className="border-green-500 text-green-500 hover:bg-green-950">
               OC-ID Login
             </Button>
             <Button onClick={()=> {window.location.href="https://github.com/Aryanzutshi/Sentinel"}} className="bg-green-600 hover:bg-green-700 text-black">Github</Button>
