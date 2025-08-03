@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono } from "next/font/google"; // Adjust import if needed (e.g., from 'next/font/google')
 import "./globals.css";
-import OCConnectWrapper from '../components/OCConnectWrapper';
+// import OCConnectWrapper from '../components/OCConnectWrapper';
+import { ClientProvider } from "@/components/ClientProvider"; // Adjust path if your components folder is different
+import { ReactNode } from "react";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -38,25 +40,20 @@ export const metadata: Metadata = {
   }
 };
 
-import { ReactNode } from "react";
-
 export default function RootLayout({
   children,
 }: {
   children: ReactNode;
 }) {
-  const opts = {
-    redirectUri: 'https://sentinel-interface-lyart.vercel.app/', 
-    referralCode: 'PARTNER6', // Assign partner code
-  };
+  // Removed unused 'opts' variable; re-add if needed
 
   return (
     <html lang="en" className="scroll-smooth">
       <body className="overflow-x-hidden">
-        <OCConnectWrapper opts={opts} sandboxMode={true}>
+        <ClientProvider>
           {children}
-        </OCConnectWrapper>
+        </ClientProvider>
       </body>
     </html>
   );
-}
+} 

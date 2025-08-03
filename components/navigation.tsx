@@ -4,12 +4,27 @@ import { useState, useEffect } from "react"
 import { Shield, Menu, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
+import { useSDK } from "@metamask/sdk-react"
+import toast from "react-hot-toast"
 // import { useOCAuth } from '@opencampus/ocid-connect-js';
 
 export function Navigation() {
   // const { ocAuth } = useOCAuth();
   const [isScrolled, setIsScrolled] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const { connected, chainId } = useSDK()
+  
+  // Check if wallet is properly connected to the right chain
+  const isWalletReady = connected && chainId === "0x20a55"
+  
+  const handleProtectedNavigation = (e: React.MouseEvent, href: string) => {
+    if (!isWalletReady) {
+      e.preventDefault()
+      toast.error("Please connect your wallet to Hyperion Testnet to access this feature.")
+      return false
+    }
+    window.location.href = href
+  }
 
   useEffect(() => {
     const handleScroll = () => {
@@ -42,31 +57,31 @@ export function Navigation() {
         </div>
 
         <nav className="hidden md:flex items-center space-x-8">
-          <Link href='/features' className="text-green-400 hover:text-green-300 transition-colors">
+          <a href="#" onClick={(e) => handleProtectedNavigation(e, '/features')} className="text-green-400 hover:text-green-300 transition-colors cursor-pointer">
             Features
-          </Link>
-          <Link href="/upload-contract" className="text-green-400 hover:text-green-300 transition-colors">
+          </a>
+          <a href="#" onClick={(e) => handleProtectedNavigation(e, '/upload-contract')} className="text-green-400 hover:text-green-300 transition-colors cursor-pointer">
             Upload Contract
-          </Link>
-          <Link href="https://sentinel-whitepaper.vercel.app/" className="text-green-400 hover:text-green-300 transition-colors">
+          </a>
+          <a href="#" onClick={(e) => handleProtectedNavigation(e, 'https://sentinel-whitepaper.vercel.app/')} className="text-green-400 hover:text-green-300 transition-colors cursor-pointer">
             Whitepaper
-          </Link>
-          <Link href="/about" className="text-green-400 hover:text-green-300 transition-colors">
+          </a>
+          <a href="#" onClick={(e) => handleProtectedNavigation(e, '/about')} className="text-green-400 hover:text-green-300 transition-colors cursor-pointer">
             About
-          </Link>
-          <Link href="/contact" className="text-green-400 hover:text-green-300 transition-colors">
+          </a>
+          <a href="#" onClick={(e) => handleProtectedNavigation(e, '/contact')} className="text-green-400 hover:text-green-300 transition-colors cursor-pointer">
             Contact
-          </Link>
-          <Link href="/dashboard" className="text-green-400 hover:text-green-300 transition-colors">
+          </a>
+          <a href="#" onClick={(e) => handleProtectedNavigation(e, '/dashboard')} className="text-green-400 hover:text-green-300 transition-colors cursor-pointer">
             Dashboard
-          </Link>
+          </a>
         </nav>
 
         <div className="hidden md:flex items-center space-x-4">
           <Button onClick={() => {console.log("OC-ID Login")}}  variant="outline" className="border-green-500 text-green-500 hover:bg-green-950">
             OC-ID Login
           </Button>
-          <Button onClick={()=> {window.location.href="https://github.com/Aryanzutshi/Sentinel"}} className="bg-green-600 hover:bg-green-700 text-black">Github</Button>
+          <Button onClick={()=> {window.location.href="https://github.com/Aryanzutshi/Sentinelx"}} className="bg-green-600 hover:bg-green-700 text-black">Github</Button>
         </div>
 
         <button className="md:hidden text-green-500" onClick={() => setMobileMenuOpen(true)}>
@@ -87,30 +102,30 @@ export function Navigation() {
         </div>
 
         <div className="flex flex-col items-center justify-center h-full space-y-8">
-          <Link href="/features" className="text-green-400 text-2xl" onClick={() => setMobileMenuOpen(false)}>
+          <a href="#" onClick={(e) => { handleProtectedNavigation(e, '/features'); setMobileMenuOpen(false); }} className="text-green-400 text-2xl cursor-pointer">
             Features
-          </Link>
-          <Link href="/upload-contract" className="text-green-400 text-2xl" onClick={() => setMobileMenuOpen(false)}>
+          </a>
+          <a href="#" onClick={(e) => { handleProtectedNavigation(e, '/upload-contract'); setMobileMenuOpen(false); }} className="text-green-400 text-2xl cursor-pointer">
             Upload Contract
-          </Link>
-          <Link href="/documentation" className="text-green-400 text-2xl" onClick={() => setMobileMenuOpen(false)}>
+          </a>
+          <a href="#" onClick={(e) => { handleProtectedNavigation(e, '/documentation'); setMobileMenuOpen(false); }} className="text-green-400 text-2xl cursor-pointer">
             Documentation
-          </Link>
-          <Link href="/about" className="text-green-400 text-2xl" onClick={() => setMobileMenuOpen(false)}>
+          </a>
+          <a href="#" onClick={(e) => { handleProtectedNavigation(e, '/about'); setMobileMenuOpen(false); }} className="text-green-400 text-2xl cursor-pointer">
             About
-          </Link>
-          <Link href="/contact" className="text-green-400 text-2xl" onClick={() => setMobileMenuOpen(false)}>
+          </a>
+          <a href="#" onClick={(e) => { handleProtectedNavigation(e, '/contact'); setMobileMenuOpen(false); }} className="text-green-400 text-2xl cursor-pointer">
             Contact
-          </Link>
-          <Link href="/dashboard" className="text-green-400 text-2xl" onClick={() => setMobileMenuOpen(false)}>
+          </a>
+          <a href="#" onClick={(e) => { handleProtectedNavigation(e, '/dashboard'); setMobileMenuOpen(false); }} className="text-green-400 text-2xl cursor-pointer">
             Dashboard
-          </Link>
+          </a>
 
           <div className="pt-8 flex flex-col space-y-4">
             <Button onClick={() => {console.log("OC-ID Login")}} variant="outline" className="border-green-500 text-green-500 hover:bg-green-950">
               OC-ID Login
             </Button>
-            <Button onClick={()=> {window.location.href="https://github.com/Aryanzutshi/Sentinel"}} className="bg-green-600 hover:bg-green-700 text-black">Github</Button>
+            <Button onClick={()=> {window.location.href="https://github.com/Aryanzutshi/Sentinelx"}} className="bg-green-600 hover:bg-green-700 text-black">Github</Button>
           </div>
         </div>
       </div>

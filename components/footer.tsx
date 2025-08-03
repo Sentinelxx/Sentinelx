@@ -13,7 +13,7 @@ export function Footer() {
             </div>
             <p className="text-green-400 mb-4">The ultimate firewall for smart contracts.</p>
             <div className="flex space-x-4">
-              <Link href="https://github.com/Linkryanzutshi/Sentinel" className="text-green-500 hover:text-green-400">
+              <Link href="https://github.com/Linkryanzutshi/Sentinelx" className="text-green-500 hover:text-green-400">
                 <Github className="h-5 w-5" />
               </Link>
               <Link href="https://x.com.aryanzutshi12" className="text-green-500 hover:text-green-400">
