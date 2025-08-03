@@ -7,7 +7,7 @@ const cspHeader = `
   style-src 'self' 'unsafe-inline';
   img-src 'self' blob: data:;
   font-src 'self' https://fonts.gstatic.com;
-  connect-src 'self' http://localhost:3000;
+  connect-src 'self' https://sentinelx-backend.onrender.com;
   object-src 'none';
   base-uri 'self';
   form-action 'self';
