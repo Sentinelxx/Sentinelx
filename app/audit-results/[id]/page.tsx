@@ -31,7 +31,12 @@ export default function AuditResults() {
     if (storedData) {
       setAuditData(JSON.parse(storedData))
     } else {
-      router.push('/upload-contract')
+      // Check if we're in the browser before redirecting
+      if (typeof window !== 'undefined') {
+        console.log(`No audit data found for ID: ${auditId}`)
+        // Instead of immediate redirect, show a message with options
+        setAuditData(null)
+      }
     }
     setLoading(false)
   }, [params.id, router])
@@ -192,13 +197,46 @@ export default function AuditResults() {
 
   if (!auditData) {
     return (
-      <main className="min-h-screen bg-black text-green-500 font-mono flex items-center justify-center">
-        <div className="text-center">
-          <div className="text-red-500 mb-4">Audit results not found</div>
-          <Button onClick={() => router.push('/upload-contract')} className="bg-green-600 hover:bg-green-700 text-black">
-            Start New Audit
-          </Button>
-        </div>
+      <main className="min-h-screen bg-black text-green-500 font-mono">
+        <Navigation />
+        <section className="pt-32 pb-16 px-4">
+          <div className="max-w-4xl mx-auto text-center">
+            <div className="bg-green-950/10 border border-green-900 rounded-lg p-8">
+              <Shield className="h-16 w-16 mx-auto mb-4 text-red-500" />
+              <h1 className="text-2xl font-bold mb-4 text-red-400">Audit Results Not Found</h1>
+              <p className="text-green-400 mb-6">
+                The audit results for ID <code className="bg-green-950/50 px-2 py-1 rounded">{params.id}</code> could not be found.
+                This might happen if:
+              </p>
+              <div className="text-left max-w-md mx-auto mb-8">
+                <ul className="list-disc list-inside space-y-2 text-green-400">
+                  <li>The audit session has expired</li>
+                  <li>The page was refreshed after the audit</li>
+                  <li>The audit ID is incorrect</li>
+                  <li>The audit was completed in a different browser session</li>
+                </ul>
+              </div>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <Button 
+                  onClick={() => router.push('/upload-contract')} 
+                  className="bg-green-600 hover:bg-green-700 text-black font-bold"
+                >
+                  <FileText className="h-4 w-4 mr-2" />
+                  Start New Audit
+                </Button>
+                <Button 
+                  onClick={() => router.push('/')} 
+                  variant="outline"
+                  className="border-green-800 text-green-500 hover:bg-green-950/50"
+                >
+                  <ArrowLeft className="h-4 w-4 mr-2" />
+                  Back to Home
+                </Button>
+              </div>
+            </div>
+          </div>
+        </section>
+        <Footer />
       </main>
     )
   }
