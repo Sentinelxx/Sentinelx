@@ -71,9 +71,9 @@ export function Navigation() {
         </nav>
 
         <div className="hidden md:flex items-center space-x-4">
-          <Button onClick={() => {console.log("OC-ID Login")}}  variant="outline" className="border-green-500 text-green-500 hover:bg-green-950">
+          {/* <Button onClick={() => {console.log("OC-ID Login")}}  variant="outline" className="border-green-500 text-green-500 hover:bg-green-950">
             OC-ID Login
-          </Button>
+          </Button> */}
           <Button onClick={()=> {window.location.href="https://github.com/Aryanzutshi/Sentinelx"}} className="bg-green-600 hover:bg-green-700 text-black">Github</Button>
         </div>
 
