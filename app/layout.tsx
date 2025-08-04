@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google"; // Adjust import if needed (e.g., from 'next/font/google')
 import "./globals.css";
-// import OCConnectWrapper from '../components/OCConnectWrapper';
+
 import { ClientProvider } from "@/components/ClientProvider"; // Adjust path if your components folder is different
 import { ReactNode } from "react";
 

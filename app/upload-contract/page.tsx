@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
@@ -14,13 +14,26 @@ import {
   Zap,
   Shield,
   AlertTriangle,
+  CheckCircle,
+  X,
 } from "lucide-react";
 
 export default function UploadContract() {
   const [contractCode, setContractCode] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [dragActive, setDragActive] = useState(false);
+  const [uploadedFileName, setUploadedFileName] = useState<string | null>(null);
+  const [originalUploadedCode, setOriginalUploadedCode] = useState("");
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
+
+  // Reset uploaded filename if user manually edits the code
+  useEffect(() => {
+    if (uploadedFileName && contractCode !== originalUploadedCode) {
+      setUploadedFileName(null);
+      setOriginalUploadedCode("");
+    }
+  }, [contractCode, uploadedFileName, originalUploadedCode]);
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -29,6 +42,12 @@ export default function UploadContract() {
       reader.onload = (e) => {
         const text = e.target?.result as string;
         setContractCode(text);
+        setUploadedFileName(file.name);
+        setOriginalUploadedCode(text);
+        toast.success(`File "${file.name}" loaded successfully!`);
+      };
+      reader.onerror = () => {
+        toast.error("Error reading file");
       };
       reader.readAsText(file);
     } else {
@@ -53,12 +72,19 @@ export default function UploadContract() {
 
     const files = e.dataTransfer.files;
     if (files && files[0] && files[0].name.endsWith(".sol")) {
+      const file = files[0];
       const reader = new FileReader();
       reader.onload = (e) => {
         const text = e.target?.result as string;
         setContractCode(text);
+        setUploadedFileName(file.name);
+        setOriginalUploadedCode(text);
+        toast.success(`File "${file.name}" loaded successfully!`);
       };
-      reader.readAsText(files[0]);
+      reader.onerror = () => {
+        toast.error("Error reading file");
+      };
+      reader.readAsText(file);
     } else {
       toast.error("Please upload a .sol file");
     }
@@ -149,37 +175,87 @@ export default function UploadContract() {
                   Upload File
                 </h2>
 
-                <div
-                  className={`relative border-2 border-dashed rounded-lg p-8 text-center transition-colors ${
-                    dragActive
-                      ? "border-green-500 bg-green-500/10"
-                      : "border-green-800 hover:border-green-600"
-                  }`}
-                  onDragEnter={handleDrag}
-                  onDragLeave={handleDrag}
-                  onDragOver={handleDrag}
-                  onDrop={handleDrop}
-                >
-                  <Upload className="h-12 w-12 mx-auto mb-4 text-green-500" />
-                  <p className="mb-2">Drag and drop your .sol file here</p>
-                  <p className="text-sm text-green-400 mb-4">or</p>
-
-                  <label className="cursor-pointer">
-                    <Button className="bg-green-600 hover:bg-green-700 text-black font-bold">
-                      Browse Files
-                    </Button>
+                {uploadedFileName ? (
+                  // File uploaded state
+                  <div className="relative border-2 border-green-500 bg-green-500/10 rounded-lg p-8 text-center">
+                    <CheckCircle className="h-12 w-12 mx-auto mb-4 text-green-500" />
+                    <p className="mb-2 text-green-400">File uploaded successfully!</p>
+                    <div className="flex items-center justify-center mb-4">
+                      <FileText className="h-4 w-4 mr-2 text-green-500" />
+                      <span className="font-mono text-sm">{uploadedFileName}</span>
+                    </div>
+                    
+                    <div className="flex justify-center gap-3">
+                      <Button 
+                        onClick={() => fileInputRef.current?.click()}
+                        variant="outline"
+                        size="sm"
+                        className="border-green-600 text-green-500 hover:bg-green-950/50"
+                      >
+                        Upload Different File
+                      </Button>
+                      <Button 
+                        onClick={() => {
+                          setContractCode("");
+                          setUploadedFileName(null);
+                          setOriginalUploadedCode("");
+                          if (fileInputRef.current) {
+                            fileInputRef.current.value = '';
+                          }
+                        }}
+                        variant="outline"
+                        size="sm"
+                        className="border-red-600 text-red-500 hover:bg-red-950/50"
+                      >
+                        <X className="h-4 w-4 mr-1" />
+                        Remove
+                      </Button>
+                    </div>
+                    
                     <input
+                      ref={fileInputRef}
                       type="file"
                       accept=".sol"
                       onChange={handleFileUpload}
                       className="hidden"
                     />
-                  </label>
+                  </div>
+                ) : (
+                  // Upload interface
+                  <div
+                    className={`relative border-2 border-dashed rounded-lg p-8 text-center transition-colors ${
+                      dragActive
+                        ? "border-green-500 bg-green-500/10"
+                        : "border-green-800 hover:border-green-600"
+                    }`}
+                    onDragEnter={handleDrag}
+                    onDragLeave={handleDrag}
+                    onDragOver={handleDrag}
+                    onDrop={handleDrop}
+                  >
+                    <Upload className="h-12 w-12 mx-auto mb-4 text-green-500" />
+                    <p className="mb-2">Drag and drop your .sol file here</p>
+                    <p className="text-sm text-green-400 mb-4">or</p>
 
-                  <p className="text-xs text-green-400 mt-4">
-                    Only .sol files are supported (max 10MB)
-                  </p>
-                </div>
+                    <Button 
+                      onClick={() => fileInputRef.current?.click()}
+                      className="bg-green-600 hover:bg-green-700 text-black font-bold"
+                    >
+                      Browse Files
+                    </Button>
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      accept=".sol"
+                      onChange={handleFileUpload}
+                      className="hidden"
+                    />
+
+                    <p className="text-xs text-green-400 mt-4">
+                      Only .sol files are supported (max 10MB)
+                    </p>
+                  </div>
+                )}
               </div>
 
               {/* Code Input Section */}
@@ -208,7 +284,14 @@ contract MyContract {
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => setContractCode("")}
+                    onClick={() => {
+                      setContractCode("");
+                      setUploadedFileName(null);
+                      setOriginalUploadedCode("");
+                      if (fileInputRef.current) {
+                        fileInputRef.current.value = '';
+                      }
+                    }}
                     className="text-xs border-green-800 text-green-500 hover:bg-green-950/50"
                   >
                     Clear

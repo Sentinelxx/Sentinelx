@@ -6,10 +6,10 @@ import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import { useSDK } from "@metamask/sdk-react"
 import toast from "react-hot-toast"
-// import { useOCAuth } from '@opencampus/ocid-connect-js';
+
 
 export function Navigation() {
-  // const { ocAuth } = useOCAuth();
+
   const [isScrolled, setIsScrolled] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const { connected, chainId } = useSDK()
@@ -35,14 +35,7 @@ export function Navigation() {
     return () => window.removeEventListener("scroll", handleScroll)
   }, [])
 
- 
-  // const handleLogin = async () => {
-  //   try {
-  //     await ocAuth.signInWithRedirect({ state: 'opencampus' });
-  //   } catch (error) {
-  //     console.error('Login error:', error);
-  //   }
-  // };
+
 
   return (
     <header
