@@ -132,8 +132,18 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(response)
   } catch (error) {
     console.error('Dashboard API error:', error)
+    
+    // More detailed error logging for debugging
+    if (error instanceof Error) {
+      console.error('Error message:', error.message)
+      console.error('Error stack:', error.stack)
+    }
+    
     return NextResponse.json(
-      { error: 'Failed to fetch dashboard data' },
+      { 
+        error: 'Failed to fetch dashboard data',
+        details: process.env.NODE_ENV === 'development' ? error.message : 'Database connection failed'
+      },
       { status: 500 }
     )
   }
