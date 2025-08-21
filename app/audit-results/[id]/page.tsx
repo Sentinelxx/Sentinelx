@@ -13,7 +13,7 @@ import { saveAs } from 'file-saver';
 import { Navigation } from "@/components/navigation"
 import { Footer } from "@/components/footer"
 import { Button } from "@/components/ui/button"
-import { ArrowLeft, Download, Share, FileText, Shield, Clock } from "lucide-react"
+import { ArrowLeft, Download, Share, FileText, Shield, Clock, PenTool, CheckCircle } from "lucide-react"
 
 hljs.registerLanguage('solidity', solidity);
 
@@ -300,7 +300,7 @@ export default function AuditResults() {
               Contract Overview
             </h2>
             
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm mb-6">
               <div>
                 <span className="text-green-400">Lines of Code:</span> {auditData.contractCode.split('\n').length}
               </div>
@@ -311,6 +311,39 @@ export default function AuditResults() {
                 <span className="text-green-400">Analysis Time:</span> ~30 seconds
               </div>
             </div>
+
+            {/* Signature Verification Info */}
+            {auditData.signatureHash && (
+              <div className="border-t border-green-800 pt-4">
+                <h3 className="text-lg font-semibold mb-3 flex items-center">
+                  <PenTool className="h-4 w-4 mr-2" />
+                  Verification Details
+                </h3>
+                <div className="bg-green-500/10 border border-green-500 rounded-lg p-4">
+                  <div className="flex items-center mb-2">
+                    <CheckCircle className="h-5 w-5 text-green-500 mr-2" />
+                    <span className="text-green-400 font-semibold">Audit Verified</span>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                    <div>
+                      <span className="text-green-400">Wallet Address:</span>
+                      <div className="font-mono text-xs bg-green-950/50 px-2 py-1 rounded mt-1">
+                        {auditData.walletAddress}
+                      </div>
+                    </div>
+                    <div>
+                      <span className="text-green-400">Signature Hash:</span>
+                      <div className="font-mono text-xs bg-green-950/50 px-2 py-1 rounded mt-1">
+                        {auditData.signatureHash.substring(0, 20)}...
+                      </div>
+                    </div>
+                  </div>
+                  <p className="text-xs text-green-400 mt-3">
+                    This audit was verified through cryptographic signature, ensuring authenticity and integrity.
+                  </p>
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Audit Report */}
