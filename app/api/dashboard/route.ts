@@ -70,7 +70,7 @@ export async function GET(request: NextRequest) {
       orderBy: {
         confidence: 'desc'
       },
-      take: 10,
+      take: 20, // Increased to show more insights
     })
 
     // Format the data to match the frontend expectations

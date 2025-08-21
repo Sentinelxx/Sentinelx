@@ -33,6 +33,7 @@ export default function AiAuditsPage() {
   const [activeTab, setActiveTab] = useState("overview")
   const [searchQuery, setSearchQuery] = useState("")
   const [selectedWallet, setSelectedWallet] = useState<string>("")
+  const [showAllInsights, setShowAllInsights] = useState(false)
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const router = useRouter()
   
@@ -360,9 +361,9 @@ export default function AiAuditsPage() {
             <Tabs defaultValue="overview" className="mb-8" onValueChange={setActiveTab}>
               <TabsList className="bg-green-950/30 border border-green-900">
                 <TabsTrigger value="overview">Overview</TabsTrigger>
-                <TabsTrigger value="vulnerabilities">Vulnerabilities</TabsTrigger>
+                {/* <TabsTrigger value="vulnerabilities">Vulnerabilities</TabsTrigger> */}
                 <TabsTrigger value="ai-insights">AI Insights</TabsTrigger>
-                <TabsTrigger value="reports">Reports</TabsTrigger>
+                {/* <TabsTrigger value="reports">Reports</TabsTrigger> */}
               </TabsList>
 
               <TabsContent value="overview" className="mt-6">
@@ -464,19 +465,23 @@ export default function AiAuditsPage() {
                       </div>
                     </div>
 
-                    <div className="bg-green-950/10 border border-green-900 rounded-lg p-6">
+                    {/* <div className="bg-green-950/10 border border-green-900 rounded-lg p-6">
                       <div className="flex items-center justify-between mb-4">
                         <h2 className="text-xl font-bold flex items-center">
                           <Brain className="h-5 w-5 mr-2" />
                           AI Security Insights
                         </h2>
-                        <Button variant="outline" className="text-xs h-8 border-green-800 text-green-500">
-                          View All <ChevronDown className="ml-1 h-3 w-3" />
+                        <Button 
+                          variant="outline" 
+                          className="text-xs h-8 border-green-800 text-green-500"
+                          onClick={() => setShowAllInsights(!showAllInsights)}
+                        >
+                          {showAllInsights ? 'Show Less' : 'View All'} <ChevronDown className={`ml-1 h-3 w-3 transition-transform ${showAllInsights ? 'rotate-180' : ''}`} />
                         </Button>
                       </div>
 
                       <div className="space-y-4">
-                        {aiInsights.slice(0, 3).map((insight, index) => (
+                        {aiInsights.slice(0, showAllInsights ? aiInsights.length : 6).map((insight, index) => (
                           <div key={index} className="bg-green-950/20 border border-green-900 rounded-lg p-4">
                             <div className="flex items-start">
                               <div className={`p-2 rounded-full ${getSeverityBgColor(insight.severity)} mr-3`}>
@@ -504,6 +509,7 @@ export default function AiAuditsPage() {
                         </Button>
                       </div>
                     </div>
+                  </div> */}
                   </div>
 
                   <div className="lg:col-span-1">
