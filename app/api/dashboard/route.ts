@@ -142,7 +142,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(
       { 
         error: 'Failed to fetch dashboard data',
-        details: process.env.NODE_ENV === 'development' ? error.message : 'Database connection failed'
+        details: process.env.NODE_ENV === 'development' ? (error instanceof Error ? error.message : String(error)) : 'Database connection failed'
       },
       { status: 500 }
     )
