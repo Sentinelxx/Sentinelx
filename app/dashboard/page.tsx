@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect, useRef } from "react"
+import { useRouter } from "next/navigation"
 import { Navigation } from "@/components/navigation"
 import { Footer } from "@/components/footer"
 import {
@@ -11,148 +12,32 @@ import {
   FileText,
   BarChart3,
   Activity,
-  Zap,
-  Lock,
   Search,
   ChevronDown,
   RefreshCw,
   Download,
   Filter,
   ArrowRight,
+  Wallet,
+  ExternalLink,
+  Lock,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Progress } from "@/components/ui/progress"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Input } from "@/components/ui/input"
-
-// Mock data for the dashboard
-const auditSummary = {
-  score: 87,
-  criticalIssues: 0,
-  highIssues: 2,
-  mediumIssues: 5,
-  lowIssues: 12,
-  informational: 8,
-  lastScan: "2025-03-28T14:30:00",
-  contractsScanned: 7,
-  vulnerabilitiesFixed: 18,
-  scanDuration: "3m 42s",
-}
-
-const recentAudits = [
-  {
-    id: "audit-001",
-    contractName: "TokenVault",
-    contractAddress: "0x742d35Cc6634C0532925a3b844Bc454e4438f44e",
-    timestamp: "2025-03-28T14:30:00",
-    score: 87,
-    status: "Completed",
-    issues: {
-      critical: 0,
-      high: 2,
-      medium: 3,
-      low: 5,
-      info: 3,
-    },
-  },
-  {
-    id: "audit-002",
-    contractName: "LiquidityPool",
-    contractAddress: "0x123f681646d4a755815f9cb19e1acc8565a0c2ac",
-    timestamp: "2025-03-27T10:15:00",
-    score: 92,
-    status: "Completed",
-    issues: {
-      critical: 0,
-      high: 0,
-      medium: 2,
-      low: 4,
-      info: 2,
-    },
-  },
-  {
-    id: "audit-003",
-    contractName: "NFTMarketplace",
-    contractAddress: "0x7be8076f4ea4a4ad08075c2508e481d6c946d12b",
-    timestamp: "2025-03-26T16:45:00",
-    score: 76,
-    status: "Completed",
-    issues: {
-      critical: 0,
-      high: 3,
-      medium: 4,
-      low: 6,
-      info: 5,
-    },
-  },
-  {
-    id: "audit-004",
-    contractName: "StakingRewards",
-    contractAddress: "0x9e5a52f57b3038f1b8edc782a5f9b55593e4cb93",
-    timestamp: "2025-03-25T09:20:00",
-    score: 95,
-    status: "Completed",
-    issues: {
-      critical: 0,
-      high: 0,
-      medium: 1,
-      low: 3,
-      info: 4,
-    },
-  },
-]
-
-const vulnerabilityTypes = [
-  { name: "Reentrancy", count: 3, severity: "High" },
-  { name: "Access Control", count: 5, severity: "Medium" },
-  { name: "Integer Overflow", count: 2, severity: "Medium" },
-  { name: "Front-Running", count: 4, severity: "High" },
-  { name: "Oracle Manipulation", count: 1, severity: "Critical" },
-  { name: "Unchecked Return Values", count: 7, severity: "Low" },
-  { name: "Gas Optimization", count: 8, severity: "Informational" },
-]
-
-const aiInsights = [
-  {
-    title: "Potential Reentrancy in TokenVault",
-    description:
-      "AI detected a potential reentrancy vulnerability in the withdraw function. Consider implementing a reentrancy guard.",
-    severity: "High",
-    confidence: 92,
-    location: "TokenVault.sol:156-178",
-  },
-  {
-    title: "Centralization Risk in Admin Functions",
-    description:
-      "Multiple critical functions rely on a single admin address. Consider implementing a multi-signature approach.",
-    severity: "Medium",
-    confidence: 87,
-    location: "Multiple contracts",
-  },
-  {
-    title: "Timestamp Dependence",
-    description:
-      "Contract relies on block.timestamp for critical operations. Consider using more secure time measurement.",
-    severity: "Medium",
-    confidence: 79,
-    location: "LiquidityPool.sol:203-215",
-  },
-  {
-    title: "Potential Flash Loan Attack Vector",
-    description:
-      "Price calculation mechanism could be vulnerable to flash loan attacks. Consider implementing price oracle.",
-    severity: "High",
-    confidence: 85,
-    location: "LiquidityPool.sol:342-367",
-  },
-]
+import { useDashboard } from "@/lib/hooks/useDashboard"
 
 export default function AiAuditsPage() {
   const [loaded, setLoaded] = useState(false)
   const [activeTab, setActiveTab] = useState("overview")
   const [searchQuery, setSearchQuery] = useState("")
-  const [isRefreshing, setIsRefreshing] = useState(false)
+  const [selectedWallet, setSelectedWallet] = useState<string>("")
   const canvasRef = useRef<HTMLCanvasElement>(null)
+  const router = useRouter()
+  
+  // Fetch dashboard data using the hook
+  const { data, loading, error, refetch } = useDashboard(selectedWallet || undefined)
 
   // Background matrix effect
   useEffect(() => {
@@ -225,10 +110,7 @@ export default function AiAuditsPage() {
   }, [])
 
   const handleRefresh = () => {
-    setIsRefreshing(true)
-    setTimeout(() => {
-      setIsRefreshing(false)
-    }, 2000)
+    refetch()
   }
 
   const formatDate = (dateString: string) => {
@@ -292,6 +174,67 @@ export default function AiAuditsPage() {
     return "border-red-500"
   }
 
+  // Show loading state
+  if (loading) {
+    return (
+      <main className="min-h-screen bg-black text-green-500 font-mono">
+        <canvas ref={canvasRef} className="fixed inset-0 z-0" />
+        <div className="relative z-10">
+          <Navigation />
+          <section className="pt-32 pb-16 px-4">
+            <div className="max-w-7xl mx-auto text-center">
+              <div className="inline-flex items-center bg-green-950/50 px-4 py-2 rounded-full mb-4">
+                <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+                <span className="text-sm">Loading Dashboard...</span>
+              </div>
+            </div>
+          </section>
+        </div>
+      </main>
+    )
+  }
+
+  // Show error state
+  if (error) {
+    return (
+      <main className="min-h-screen bg-black text-green-500 font-mono">
+        <canvas ref={canvasRef} className="fixed inset-0 z-0" />
+        <div className="relative z-10">
+          <Navigation />
+          <section className="pt-32 pb-16 px-4">
+            <div className="max-w-7xl mx-auto text-center">
+              <div className="inline-flex items-center bg-red-950/50 px-4 py-2 rounded-full mb-4">
+                <AlertTriangle className="h-4 w-4 mr-2" />
+                <span className="text-sm">Error: {error}</span>
+              </div>
+              <Button onClick={handleRefresh} className="bg-green-600 hover:bg-green-700 text-black font-bold">
+                Retry
+              </Button>
+            </div>
+          </section>
+        </div>
+      </main>
+    )
+  }
+
+  // Get data with fallbacks
+  const auditSummary = data?.auditSummary || {
+    score: 0,
+    criticalIssues: 0,
+    highIssues: 0,
+    mediumIssues: 0,
+    lowIssues: 0,
+    informational: 0,
+    lastScan: new Date().toISOString(),
+    contractsScanned: 0,
+    vulnerabilitiesFixed: 0,
+    scanDuration: "0s",
+  }
+
+  const recentAudits = data?.recentAudits || []
+  const vulnerabilityTypes = data?.vulnerabilityTypes || []
+  const aiInsights = data?.aiInsights || []
+
   return (
     <main className="min-h-screen bg-black text-green-500 font-mono">
       <canvas ref={canvasRef} className="fixed inset-0 z-0" />
@@ -309,9 +252,26 @@ export default function AiAuditsPage() {
                 <h1 className="text-3xl md:text-4xl font-bold">
                   <span className="text-green-400">{">"}</span> Smart Contract Audit Dashboard
                 </h1>
+                {selectedWallet && (
+                  <div className="mt-2 flex items-center text-green-400">
+                    <Wallet className="h-4 w-4 mr-2" />
+                    <span className="text-sm">Wallet: {selectedWallet}</span>
+                  </div>
+                )}
               </div>
 
-              <div className="flex items-center space-x-4 mt-4 md:mt-0">
+              <div className="flex flex-col md:flex-row items-start md:items-center space-y-4 md:space-y-0 md:space-x-4 mt-4 md:mt-0">
+                <div className="relative">
+                  <Input
+                    type="text"
+                    placeholder="Filter by wallet address..."
+                    className="w-full md:w-64 bg-black border-green-800 focus:border-green-500 text-green-500 pl-10"
+                    value={selectedWallet}
+                    onChange={(e) => setSelectedWallet(e.target.value)}
+                  />
+                  <Wallet className="absolute left-3 top-2.5 h-4 w-4 text-green-800" />
+                </div>
+
                 <div className="relative">
                   <Input
                     type="text"
@@ -326,8 +286,9 @@ export default function AiAuditsPage() {
                 <Button
                   className="bg-green-950/50 hover:bg-green-950/70 border border-green-800 flex items-center gap-2"
                   onClick={handleRefresh}
+                  disabled={loading}
                 >
-                  <RefreshCw className={`h-4 w-4 ${isRefreshing ? "animate-spin" : ""}`} />
+                  <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} />
                   Refresh
                 </Button>
 
@@ -423,6 +384,8 @@ export default function AiAuditsPage() {
                           <thead>
                             <tr className="border-b border-green-900">
                               <th className="text-left py-2 text-xs font-medium text-green-400">Contract</th>
+                              <th className="text-left py-2 text-xs font-medium text-green-400">Wallet</th>
+                              <th className="text-left py-2 text-xs font-medium text-green-400">Transaction</th>
                               <th className="text-left py-2 text-xs font-medium text-green-400">Date</th>
                               <th className="text-center py-2 text-xs font-medium text-green-400">Score</th>
                               <th className="text-center py-2 text-xs font-medium text-green-400">Issues</th>
@@ -430,12 +393,35 @@ export default function AiAuditsPage() {
                             </tr>
                           </thead>
                           <tbody>
-                            {recentAudits.map((audit) => (
+                            {recentAudits
+                              .filter((audit) => 
+                                !searchQuery || 
+                                audit.contractName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                                audit.contractAddress.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                                audit.walletAddress.toLowerCase().includes(searchQuery.toLowerCase())
+                              )
+                              .map((audit) => (
                               <tr key={audit.id} className="border-b border-green-900/50 hover:bg-green-950/20">
                                 <td className="py-3">
                                   <div className="font-bold">{audit.contractName}</div>
-                                  <div className="text-xs text-green-400 truncate max-w-[180px]">
+                                  <div className="text-xs text-green-400 truncate max-w-[140px]">
                                     {audit.contractAddress}
+                                  </div>
+                                </td>
+                                <td className="py-3">
+                                  <div className="flex items-center">
+                                    <Wallet className="h-3 w-3 mr-1 text-green-400" />
+                                    <span className="text-xs text-green-400 truncate max-w-[100px]">
+                                      {audit.walletAddress}
+                                    </span>
+                                  </div>
+                                </td>
+                                <td className="py-3">
+                                  <div className="flex items-center">
+                                    <ExternalLink className="h-3 w-3 mr-1 text-green-400" />
+                                    <span className="text-xs text-green-400 truncate max-w-[100px]">
+                                      {audit.transactionHash}
+                                    </span>
                                   </div>
                                 </td>
                                 <td className="py-3 text-sm">{formatDate(audit.timestamp)}</td>
@@ -462,7 +448,12 @@ export default function AiAuditsPage() {
                                   </div>
                                 </td>
                                 <td className="py-3 text-right">
-                                  <Button variant="ghost" size="sm" className="h-7 text-xs text-green-500">
+                                  <Button 
+                                    variant="ghost" 
+                                    size="sm" 
+                                    className="h-7 text-xs text-green-500"
+                                    onClick={() => router.push(`/audit-reports/${audit.id}`)}
+                                  >
                                     View Report
                                   </Button>
                                 </td>
@@ -597,34 +588,7 @@ export default function AiAuditsPage() {
                       </div>
                     </div>
 
-                    <div className="bg-green-950/10 border border-green-900 rounded-lg p-6">
-                      <h2 className="text-xl font-bold flex items-center mb-4">
-                        <Zap className="h-5 w-5 mr-2" />
-                        Quick Actions
-                      </h2>
 
-                      <div className="space-y-3">
-                        <Button className="w-full justify-start bg-green-950/30 hover:bg-green-950/50 border border-green-800 text-green-500">
-                          <Shield className="h-4 w-4 mr-2" />
-                          Run New Audit
-                        </Button>
-
-                        <Button className="w-full justify-start bg-green-950/30 hover:bg-green-950/50 border border-green-800 text-green-500">
-                          <Lock className="h-4 w-4 mr-2" />
-                          Deploy Protection
-                        </Button>
-
-                        <Button className="w-full justify-start bg-green-950/30 hover:bg-green-950/50 border border-green-800 text-green-500">
-                          <Download className="h-4 w-4 mr-2" />
-                          Export Reports
-                        </Button>
-
-                        <Button className="w-full justify-start bg-green-950/30 hover:bg-green-950/50 border border-green-800 text-green-500">
-                          <Brain className="h-4 w-4 mr-2" />
-                          AI Recommendations
-                        </Button>
-                      </div>
-                    </div>
                   </div>
                 </div>
               </TabsContent>

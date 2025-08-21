@@ -1,0 +1,147 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  walletAddress String @unique
+  audits        Audit[]
+
+  @@map("users")
+}
+
+model Audit {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Core audit information
+  contractName    String
+  contractAddress String
+  transactionHash String @unique // Generated when audit is made
+  score          Int     @default(0)
+  status         String  @default("Pending") // Pending, In Progress, Completed, Failed
+  scanDuration   String?
+  report         String? // Full AI audit report in markdown format
+
+  // User who initiated the audit
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Vulnerability counts
+  criticalIssues    Int @default(0)
+  highIssues        Int @default(0)
+  mediumIssues      Int @default(0)
+  lowIssues         Int @default(0)
+  informationalIssues Int @default(0)
+
+  // Related data
+  vulnerabilities Vulnerability[]
+  aiInsights      AiInsight[]
+  auditMetrics    AuditMetrics?
+
+  @@map("audits")
+}
+
+model Vulnerability {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  name        String
+  description String?
+  severity    String // Critical, High, Medium, Low, Informational
+  location    String? // File location or line numbers
+  category    String? // Reentrancy, Access Control, etc.
+  confidence  Int?    // AI confidence percentage
+  fixed       Boolean @default(false)
+
+  auditId String
+  audit   Audit  @relation(fields: [auditId], references: [id], onDelete: Cascade)
+
+  @@map("vulnerabilities")
+}
+
+model AiInsight {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  title       String
+  description String
+  severity    String // Critical, High, Medium, Low, Informational
+  confidence  Int    // AI confidence percentage
+  location    String // Location in code
+  category    String? // Type of insight
+
+  auditId String
+  audit   Audit  @relation(fields: [auditId], references: [id], onDelete: Cascade)
+
+  @@map("ai_insights")
+}
+
+model AuditMetrics {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  codeCoverage     Int @default(0) // Percentage
+  testCoverage     Int @default(0) // Percentage
+  documentation    Int @default(0) // Percentage
+  bestPractices    Int @default(0) // Percentage
+  gasOptimization  Int @default(0) // Score
+  securityScore    Int @default(0) // Overall security score
+
+  auditId String @unique
+  audit   Audit  @relation(fields: [auditId], references: [id], onDelete: Cascade)
+
+  @@map("audit_metrics")
+}
+
+// Global statistics and analytics
+model GlobalStats {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  totalAudits           Int @default(0)
+  totalVulnerabilities  Int @default(0)
+  totalVulnerabilitiesFixed Int @default(0)
+  averageSecurityScore  Float @default(0)
+  totalContractsScanned Int @default(0)
+  
+  // Vulnerability breakdown
+  criticalVulns    Int @default(0)
+  highVulns        Int @default(0)
+  mediumVulns      Int @default(0)
+  lowVulns         Int @default(0)
+  informationalVulns Int @default(0)
+
+  @@map("global_stats")
+}
+
+// Vulnerability categories for analytics
+model VulnerabilityType {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  name        String @unique
+  description String?
+  severity    String
+  count       Int    @default(0)
+  category    String? // Classification category
+
+  @@map("vulnerability_types")
+}
