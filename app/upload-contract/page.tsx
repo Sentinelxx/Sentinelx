@@ -20,24 +20,25 @@ import {
   Wallet,
   PenTool,
 } from "lucide-react";
+import { ethers } from "ethers"
 
 // Helper function to parse AI response and structure data for database
 function parseAuditResponse(aiResponse: string, contractCode: string, signature: string, walletAddress: string) {
   // Extract contract name from code (simple regex to find contract declaration)
   const contractNameMatch = contractCode.match(/contract\s+(\w+)/);
   const contractName = contractNameMatch ? contractNameMatch[1] : 'UnknownContract';
-  
+
   // Generate a simple contract address (in production, this would be the actual deployed address)
   const contractAddress = `0x${Math.random().toString(16).substring(2, 42).padStart(40, '0')}`;
-  
+
   // Parse security score from AI response (look for patterns like "Score: 85" or "85/100")
   const scoreMatch = aiResponse.match(/(?:score|rating)[\s:]*(\d+)(?:\/100|%)?/i);
   const score = scoreMatch ? parseInt(scoreMatch[1]) : Math.floor(Math.random() * 40) + 60; // Default random score 60-100
-  
+
   // Parse vulnerabilities from AI response
   const vulnerabilities: any[] = [];
   const aiInsights: any[] = [];
-  
+
   // Look for vulnerability patterns in the response
   const vulnerabilityPatterns = [
     { name: 'Reentrancy', severity: 'High', keywords: ['reentrancy', 'reentrant', 'external call'] },
@@ -47,12 +48,12 @@ function parseAuditResponse(aiResponse: string, contractCode: string, signature:
     { name: 'Gas Optimization', severity: 'Informational', keywords: ['gas', 'optimization', 'efficient'] },
     { name: 'Unchecked Return Values', severity: 'Low', keywords: ['return value', 'call', 'send', 'transfer'] },
   ];
-  
+
   vulnerabilityPatterns.forEach((pattern, index) => {
-    const hasVulnerability = pattern.keywords.some(keyword => 
+    const hasVulnerability = pattern.keywords.some(keyword =>
       aiResponse.toLowerCase().includes(keyword.toLowerCase())
     );
-    
+
     if (hasVulnerability) {
       vulnerabilities.push({
         name: pattern.name,
@@ -63,7 +64,7 @@ function parseAuditResponse(aiResponse: string, contractCode: string, signature:
         confidence: Math.floor(Math.random() * 20) + 80, // 80-100% confidence
         fixed: false,
       });
-      
+
       // Create corresponding AI insight
       aiInsights.push({
         title: `${pattern.name} Detection`,
@@ -75,7 +76,7 @@ function parseAuditResponse(aiResponse: string, contractCode: string, signature:
       });
     }
   });
-  
+
   // Ensure at least one insight exists
   if (aiInsights.length === 0) {
     aiInsights.push({
@@ -87,7 +88,7 @@ function parseAuditResponse(aiResponse: string, contractCode: string, signature:
       category: 'General',
     });
   }
-  
+
   return {
     contractName,
     contractAddress,
@@ -205,32 +206,33 @@ export default function UploadContract() {
     toast.loading("Please sign the message in your wallet...");
 
     try {
-      const accounts = await provider.request({ method: 'eth_accounts' }) as string[];
+      const accounts = await provider.request({ method: "eth_accounts" }) as string[];
       const account = accounts?.[0];
 
       if (!account) {
         throw new Error("No account found");
       }
 
-      // Create a message to sign that includes contract hash and timestamp
-      const contractHash = btoa(contractCode).substring(0, 16); // Simple hash for demo
+      // Proper hash for contract code
+      const contractHash = ethers.keccak256(ethers.toUtf8Bytes(contractCode));
+
       const timestamp = Date.now();
       const message = `SentinelX Audit Verification\n\nContract Hash: ${contractHash}\nTimestamp: ${timestamp}\nAccount: ${account}\n\nBy signing this message, I verify the completion of this smart contract audit with SentinelX.`;
 
       // Sign the message
       const signature = await provider.request({
-        method: 'personal_sign',
-        params: [message, account],
+        method: "personal_sign",
+        params: [message, account], // MetaMask order
       });
 
-      // Store the signature hash in localStorage
+      // Store the signature data
       const signatureData = {
         signature,
         message,
         account,
         contractHash,
         timestamp,
-        contractCode: contractCode.substring(0, 100) + "...", // Store partial code for reference
+        contractCode: contractCode.substring(0, 100) + "...", // partial preview
       };
 
       localStorage.setItem(`sentinelx-signature-${timestamp}`, JSON.stringify(signatureData));
@@ -254,7 +256,7 @@ export default function UploadContract() {
       // Parse AI response and save to database
       try {
         const auditData = parseAuditResponse(auditResponse.response, contractCode, signature as string, account);
-        
+
         const saveResponse = await fetch('/api/audits', {
           method: 'POST',
           headers: {
@@ -275,14 +277,14 @@ export default function UploadContract() {
 
       toast.dismiss();
       toast.success("Audit verified and signed successfully!");
-      
+
       // Navigate to the results page
       router.push(`/audit-results/${auditId}`);
-      
+
     } catch (error: any) {
       console.error("Signing error:", error);
       toast.dismiss();
-      
+
       if (error.code === 4001) {
         toast.error("Signature rejected by user");
       } else {
@@ -318,7 +320,7 @@ export default function UploadContract() {
       }
 
       const data = await response.json();
-      
+
       // Store the audit response and show signing step
       setAuditResponse(data);
       setShowSigningStep(true);
@@ -376,9 +378,9 @@ export default function UploadContract() {
                       <FileText className="h-4 w-4 mr-2 text-green-500" />
                       <span className="font-mono text-sm">{uploadedFileName}</span>
                     </div>
-                    
+
                     <div className="flex justify-center gap-3">
-                      <Button 
+                      <Button
                         onClick={() => fileInputRef.current?.click()}
                         variant="outline"
                         size="sm"
@@ -386,7 +388,7 @@ export default function UploadContract() {
                       >
                         Upload Different File
                       </Button>
-                      <Button 
+                      <Button
                         onClick={() => {
                           setContractCode("");
                           setUploadedFileName(null);
@@ -403,7 +405,7 @@ export default function UploadContract() {
                         Remove
                       </Button>
                     </div>
-                    
+
                     <input
                       ref={fileInputRef}
                       type="file"
@@ -415,11 +417,10 @@ export default function UploadContract() {
                 ) : (
                   // Upload interface
                   <div
-                    className={`relative border-2 border-dashed rounded-lg p-8 text-center transition-colors ${
-                      dragActive
+                    className={`relative border-2 border-dashed rounded-lg p-8 text-center transition-colors ${dragActive
                         ? "border-green-500 bg-green-500/10"
                         : "border-green-800 hover:border-green-600"
-                    }`}
+                      }`}
                     onDragEnter={handleDrag}
                     onDragLeave={handleDrag}
                     onDragOver={handleDrag}
@@ -429,7 +430,7 @@ export default function UploadContract() {
                     <p className="mb-2">Drag and drop your .sol file here</p>
                     <p className="text-sm text-green-400 mb-4">or</p>
 
-                    <Button 
+                    <Button
                       onClick={() => fileInputRef.current?.click()}
                       className="bg-green-600 hover:bg-green-700 text-black font-bold"
                     >
@@ -499,7 +500,7 @@ contract MyContract {
                   <CheckCircle className="h-5 w-5 mr-2 text-green-500" />
                   Audit Complete - Verification Required
                 </h3>
-                
+
                 <div className="bg-green-500/10 border border-green-500 rounded-lg p-4 mb-4">
                   <p className="text-green-400 mb-2">✅ Smart contract audit completed successfully!</p>
                   <p className="text-sm text-green-300">
